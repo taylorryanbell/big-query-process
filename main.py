@@ -30,8 +30,8 @@ def run():
         project="york-cdf-start",
         region="us-central1",
         staging_location="gs://york-trb/staging",
-        job_name="taylor-bell-process2",
-        save_main_session=True
+        # job_name="taylor-bell-process2",
+        # save_main_session=True
     )
 
 
@@ -45,29 +45,36 @@ def run():
 
     new_schema = {
         'fields': [
-            {'name': 'order_id', 'type': 'INTEGER', 'mode': 'NULLABLE'},
-            {'name': 'team', 'type': 'STRING', 'mode': 'NULLABLE'},
-            {'name': 'description', 'type': 'STRING', 'mode': 'NULLABLE'}
+            {'name': 'name', 'type': 'STRING', 'mode': 'NULLABLE'},
+            {'name': 'last_name', 'type': 'STRING', 'mode': 'NULLABLE'},
         ]
     }
 
     out_table1 = bigquery.TableReference(
         projectId="york-cdf-start",
         datasetId="bigquerypython_out",
-        tableId="bqtable1-out"
+        tableId="bqtable2-out"
     )
     table1 = "york-cdf-start.bigquerypython.bqtable1"
     table2 = "york-cdf-start.bigquerypython.bqtable4"
 
     table2 = bigquery.TableReference()
 
-    with beam.Pipeline(runner="DataflowRunner", options=opt) as pipeline:
+    # runner="DataflowRunner",
+    with beam.Pipeline(options=opt) as pipeline:
         # read in BigQuery Tables
         data1 = pipeline | "ReadFromBigQuery1" >> beam.io.ReadFromBigQuery(
             query="SELECT table1.name, table2.last_name FROM `york-cdf-start.bigquerypython.bqtable1` as table1 " \
                   "JOIN `york-cdf-start.bigquerypython.bqtable4` as table2 ON table1.order_id = table2.order_id",
             use_standard_sql=True
         ) | "Print" >> beam.Map(print)
+
+        # data1 | "Write" >> beam.io.WriteToBigQuery(
+        #     out_table1,
+        #     schema=new_schema,
+        #     create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED,
+        #     custom_gcs_temp_location="gs://york-trb/tmp"
+        # )
 
 
 
