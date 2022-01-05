@@ -28,8 +28,8 @@ def run():
     opt = PipelineOptions(
         temp_location="gs://york-trb/tmp/",
         project="york-cdf-start",
-        region="us-central1",
-        staging_location="gs://york-trb/staging",
+        # region="us-central1",
+        staging_location="gs://york-trb/staging"
         # job_name="taylor-bell-process2",
         # save_main_session=True
     )
@@ -53,7 +53,7 @@ def run():
     out_table1 = bigquery.TableReference(
         projectId="york-cdf-start",
         datasetId="bigquerypython_out",
-        tableId="bqtable2-out"
+        tableId="bqtable3-out"
     )
     table1 = "york-cdf-start.bigquerypython.bqtable1"
     table2 = "york-cdf-start.bigquerypython.bqtable4"
@@ -67,44 +67,14 @@ def run():
             query="SELECT table1.name, table2.last_name FROM `york-cdf-start.bigquerypython.bqtable1` as table1 " \
                   "JOIN `york-cdf-start.bigquerypython.bqtable4` as table2 ON table1.order_id = table2.order_id",
             use_standard_sql=True
-        ) | "Print" >> beam.Map(print)
+        )
 
-        # data1 | "Write" >> beam.io.WriteToBigQuery(
-        #     out_table1,
-        #     schema=new_schema,
-        #     create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED,
-        #     custom_gcs_temp_location="gs://york-trb/tmp"
-        # )
-
-
-
-
-        # data2 = pipeline | "ReadFromBigQuery2" >> beam.io.ReadFromBigQuery(
-        #     gcs_location="gs://york-trb/tmp",
-        #     table="york-cdf-start:bigquerypython.bqtable2"
-        # )
-        # data3 = pipeline | "ReadFromBigQuery3" >> beam.io.ReadFromBigQuery(
-        #     gcs_location="gs://york-trb/tmp",
-        #     table="york-cdf-start:bigquerypython.bqtable3"
-        # )
-
-        # combined = (([
-        #     data1, data2
-        # ])
-        #             | "combine" >> beam.CoGroupByKey()
-        #             | beam.Map(print)
-        #             )
-
-        # perform transforms
-        # changed = data1 | "PrintType" >> beam.ParDo(ChangeData())
-
-        # write to bigquery
-        # changed | "WriteToBigQuery" >> beam.io.WriteToBigQuery(
-        #     table1,
-        #     schema=schema,
-        #     create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED,
-        #     custom_gcs_temp_location="gs://york-trb/tmp"
-        # )
+        data1 | "Write" >> beam.io.WriteToBigQuery(
+            out_table1,
+            schema=new_schema,
+            create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED,
+            custom_gcs_temp_location="gs://york-trb/tmp"
+        )
 
         pass
 
